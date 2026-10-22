@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HI, My BABY!  💕 -</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Handwriting & Romance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Dancing+Script:wght@700&family=Great+Vibes&family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tone.js for web audio synth effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'love-pink': '#ffd1dc',
+                        'love-rose': '#ff85a1',
+                        'love-deep': '#d81b60',
+                        'love-bg': '#fbe8eb',
+                        'kraft': '#e8d3b9',
+                    },
+                    fontFamily: {
+                        cursive: ['"Dancing Script"', 'cursive'],
+                        great: ['"Great Vibes"', 'cursive'],
+                        handwriting: ['"Caveat"', 'cursive'],
+                        serif: ['"Lora"', 'serif'],
+                        sans: ['"Nunito"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #fbe8eb;
+            background-image: radial-gradient(#f4a261 0.5px, transparent 0.5px), radial-gradient(#e76f51 0.5px, #fbe8eb 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            overflow-x: hidden;
+            font-family: 'Nunito', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* Screen Visibility state */
+        .screen {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
+        }
+        .screen.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        /* Grid paper texture */
+        .grid-paper {
+            background-color: #ffffff;
+            background-image: linear-gradient(#e5e7eb 1px, transparent 1px), linear-gradient(90deg, #e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        /* Washi tape visual effect */
+        .washi-tape {
+            background: rgba(255, 182, 193, 0.85);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: absolute;
+            height: 24px;
+            width: 90px;
+            transform: rotate(-5deg);
+            z-index: 10;
+        }
+        .washi-tape-right {
+            background: rgba(255, 218, 185, 0.9);
+            transform: rotate(8deg);
+            right: -10px;
+            top: -10px;
+        }
+
+        /* Torn paper style */
+        .torn-paper {
+            background: #fffefb;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Polaroid Card Frame */
+        .polaroid {
+            background: #ffffff;
+            padding: 12px 12px 36px 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.12);
+            transition: all 0.3s ease;
+        }
+        .polaroid:hover {
+            transform: scale(1.03) rotate(0deg) !important;
+            box-shadow: 0 15px 30px rgba(216,27,96,0.2);
+            z-index: 20;
+        }
+
+        /* Spinning Record Disc */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .spinning-vinyl {
+            animation: spin 6s linear infinite;
+        }
+        .paused-vinyl {
+            animation-play-state: paused;
+        }
+
+        /* Particle effect for floating hearts */
+        .heart-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 999;
+            animation: floatUp 2.5s ease-out forwards;
+        }
+
+        @keyframes floatUp {
+            0% {
+                opacity: 1;
+                transform: translateY(0) scale(0.8) rotate(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-120px) scale(1.4) rotate(25deg);
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-between min-h-screen p-3 md:p-6 text-gray-800">
+
+    <!-- TOP HEADER / AUDIO CONTROLLER BAR -->
+    <header class="w-full max-w-4xl flex justify-between items-center py-2 px-4 bg-white/80 backdrop-blur rounded-2xl shadow-sm border border-rose-100 mb-4 z-40">
+        <div class="flex items-center gap-2">
+            <span class="text-2xl animate-bounce">💖</span>
+            <span class="font-handwriting text-2xl font-bold text-rose-600">Hi!, My BABY!</span>
+        </div>
+        
+        <button id="soundToggleBtn" onclick="toggleAudio()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 p-2 px-4 rounded-full shadow-sm flex items-center gap-2 text-sm font-semibold transition border border-rose-200">
+            <i id="soundIcon" class="fa-solid fa-music"></i>
+            <span id="soundText">Music: OFF</span>
+        </button>
+    </header>
+
+    <!-- MAIN APP CONTAINER -->
+    <main class="w-full max-w-4xl flex-grow flex items-center justify-center relative">
+
+        <!-- SCREEN 1: WELCOME & GIFT BOY -->
+        <section id="screen1" class="screen active w-full flex-col items-center justify-center text-center p-6 bg-white/90 rounded-3xl shadow-xl border-4 border-rose-200 min-h-[520px]">
+            <div class="max-w-md w-full flex flex-col items-center gap-6">
+                <!-- Cute Boy Holding Gift Box SVG Illustration -->
+                <div class="relative cursor-pointer group" onclick="goToScreen('screen2')">
+                    <div class="w-64 h-64 sm:w-72 sm:h-72 relative flex items-center justify-center">
+                        <svg viewBox="0 0 300 300" class="w-full h-full drop-shadow-lg transition-transform duration-300 group-hover:scale-105">
+                            <path d="M40 50 L50 40 L60 50 L50 60 Z" fill="#FFD1DC"/>
+                            <path d="M240 60 L248 50 L256 60 L248 70 Z" fill="#FF85A1"/>
+                            <circle cx="230" cy="180" r="6" fill="#FFB6C1"/>
+                            
+                            <!-- Boy Body & Outfit -->
+                            <path d="M110 160 Q150 140 190 160 L185 240 L115 240 Z" fill="#4B7BEC"/>
+                            <path d="M120 120 Q150 110 180 120 L180 160 L120 160 Z" fill="#70A1FF"/>
+                            
+                            <!-- Head & Hair -->
+                            <circle cx="150" cy="90" r="38" fill="#FFE0BD"/>
+                            <path d="M115 85 Q130 50 170 60 Q188 70 185 88 Q175 75 150 72 Q125 72 115 85 Z" fill="#574B90"/>
+                            
+                            <!-- Face features -->
+                            <circle cx="138" cy="92" r="4" fill="#2C3A47"/>
+                            <circle cx="162" cy="92" r="4" fill="#2C3A47"/>
+                            <ellipse cx="133" cy="100" rx="5" ry="3" fill="#FF7B54" opacity="0.6"/>
+                            <ellipse cx="167" cy="100" rx="5" ry="3" fill="#FF7B54" opacity="0.6"/>
+                            <path d="M144 102 Q150 108 156 102" stroke="#2C3A47" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                            
+                            <!-- Arms holding gift -->
+                            <path d="M118 140 L135 170 L145 170" stroke="#FFE0BD" stroke-width="12" stroke-linecap="round" fill="none"/>
+                            <path d="M182 140 L165 170 L155 170" stroke="#FFE0BD" stroke-width="12" stroke-linecap="round" fill="none"/>
+
+                            <!-- Gift Box -->
+                            <g transform="translate(100, 150) scale(0.65)" class="animate-bounce">
+                                <rect x="20" y="40" width="110" height="90" rx="8" fill="#EE5253"/>
+                                <rect x="15" y="25" width="120" height="25" rx="5" fill="#FF6B6B"/>
+                                <rect x="65" y="25" width="20" height="105" fill="#FFDD59"/>
+                                <rect x="15" y="32" width="120" height="10" fill="#FFDD59"/>
+                                <path d="M50 15 C30 -10, 60 20, 75 25 C90 20, 120 -10, 100 15 C85 25, 75 25, 75 25 Z" fill="#FFDD59"/>
+                                <circle cx="75" cy="25" r="7" fill="#FECA57"/>
+                            </g>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <h1 class="text-3xl sm:text-4xl font-extrabold text-rose-600 font-handwriting tracking-wide">
+                        HI BABY!, I WOULD LIKE TO GIVE YOU THIS GIFT 💕
+                    </h1>
+                    <p class="text-rose-400 font-bold text-sm tracking-widest uppercase cursor-pointer animate-pulse" onclick="goToScreen('screen2')">
+                        (Click the gift box)
+                    </p>
+                </div>
+
+                <button onclick="goToScreen('screen2')" class="mt-2 bg-gradient-to-r from-rose-400 to-rose-500 hover:from-rose-500 hover:to-rose-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:scale-105 active:scale-95 flex items-center gap-2">
+                    <span>Open Gift Box</span>
+                    <i class="fa-solid fa-gift"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- SCREEN 2: ANIMATED GIFT BOX OPENING -->
+        <section id="screen2" class="screen w-full flex-col items-center justify-center text-center p-6 bg-white/90 rounded-3xl shadow-xl border-4 border-rose-200 min-h-[520px]">
+            <div class="flex flex-col items-center justify-center gap-6 my-auto">
+                
+                <div id="giftBoxContainer" class="relative cursor-pointer group my-8" onclick="openGiftBox()">
+                    
+                    <!-- Floating Items popping out -->
+                    <div id="popOutItems" class="absolute -top-28 left-1/2 -translate-x-1/2 w-80 h-36 pointer-events-none opacity-0 transition-all duration-700 ease-out flex justify-center items-center gap-4 z-30">
+                        <div class="w-16 h-14 bg-white border-2 border-rose-300 rounded shadow-md transform -rotate-12 flex items-center justify-center">
+                            <i class="fa-solid fa-envelope text-rose-500 text-2xl"></i>
+                        </div>
+                        <div class="w-18 h-18 bg-pink-100 rounded-full border-2 border-pink-300 shadow-md transform translate-y-2 flex items-center justify-center p-2">
+                            <span class="text-3xl">💐</span>
+                        </div>
+                        <div class="w-16 h-12 bg-gray-800 rounded border-2 border-rose-400 shadow-md transform rotate-12 flex items-center justify-center">
+                            <i class="fa-solid fa-tape text-rose-300 text-xl"></i>
+                        </div>
+                    </div>
+
+                    <!-- Gift Box Graphic -->
+                    <div class="relative w-56 h-56 sm:w-64 sm:h-64 flex items-center justify-center">
+                        <div id="boxLid" class="absolute top-4 z-20 transition-all duration-500 ease-in-out transform origin-top group-hover:-translate-y-3">
+                            <div class="w-60 h-16 sm:w-68 sm:h-18 bg-rose-500 rounded-t-lg shadow-md border-b-4 border-rose-700 relative flex items-center justify-center">
+                                <div class="absolute -top-10 flex gap-1">
+                                    <div class="w-10 h-10 border-4 border-amber-300 rounded-full transform -rotate-45 bg-amber-400/20"></div>
+                                    <div class="w-10 h-10 border-4 border-amber-300 rounded-full transform rotate-45 bg-amber-400/20"></div>
+                                </div>
+                                <div class="w-12 h-full bg-amber-300 border-x-2 border-amber-400"></div>
+                            </div>
+                        </div>
+
+                        <div class="w-52 h-44 sm:w-60 sm:h-48 bg-rose-600 rounded-b-xl shadow-2xl relative mt-12 overflow-hidden flex justify-center">
+                            <div class="w-12 h-full bg-amber-300 border-x-2 border-amber-400"></div>
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <p id="boxInstruction" class="text-rose-500 font-bold text-xl animate-bounce">
+                    Tap the ribbon to unwrap your gift! 🎀
+                </p>
+            </div>
+        </section>
+
+        <!-- SCREEN 3: MAIN SELECTION DASHBOARD -->
+        <section id="screen3" class="screen w-full flex-col items-center p-4 sm:p-8 grid-paper rounded-3xl shadow-xl border-4 border-rose-200 min-h-[540px]">
+            
+            <div class="text-center my-4 space-y-2">
+                <div class="inline-flex items-center gap-2">
+                    <span class="text-3xl animate-pulse">💖</span>
+                    <h2 class="text-3xl sm:text-5xl font-bold font-cursive text-rose-600 tracking-wide drop-shadow-sm">
+                        I'm So Happy to have you BABY!
+                    </h2>
+                    <span class="text-3xl animate-pulse">💖</span>
+                </div>
+                <p class="text-gray-600 font-handwriting text-2xl">I made something special just for you! Choose a gift below 👇</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-3xl my-auto py-6">
+                
+                <!-- 1: MESSAGE FOR YOU -->
+                <div onclick="goToScreen('screen4')" class="polaroid group cursor-pointer transform -rotate-2 hover:rotate-0 transition-all duration-300 flex flex-col items-center text-center p-5 border border-pink-100 rounded-xl bg-white shadow-md hover:shadow-xl">
+                    <div class="washi-tape"></div>
+                    <div class="w-32 h-32 bg-rose-50 rounded-2xl flex items-center justify-center my-3 group-hover:scale-110 transition duration-300 border border-rose-100 relative">
+                        <i class="fa-solid fa-envelope-open-text text-5xl text-rose-400 group-hover:text-rose-500"></i>
+                        <span class="absolute top-2 right-2 text-xs bg-rose-500 text-white px-2 py-0.5 rounded-full font-bold">1</span>
+                    </div>
+                    <h3 class="font-handwriting text-2xl font-bold text-gray-800 group-hover:text-rose-600">A MESSAGE FOR YOU</h3>
+                    <p class="text-xs text-gray-400 mt-1">Read my heartfelt letter</p>
+                </div>
+
+                <!-- 2: FLOWERS FOR YOU -->
+                <div onclick="goToScreen('screen5')" class="polaroid group cursor-pointer transform rotate-2 hover:rotate-0 transition-all duration-300 flex flex-col items-center text-center p-5 border border-pink-100 rounded-xl bg-white shadow-md hover:shadow-xl">
+                    <div class="washi-tape washi-tape-right"></div>
+                    <div class="w-32 h-32 bg-pink-50 rounded-2xl flex items-center justify-center my-3 group-hover:scale-110 transition duration-300 border border-pink-100 relative">
+                        <span class="text-6xl group-hover:scale-110 transition">💐</span>
+                        <span class="absolute top-2 right-2 text-xs bg-rose-500 text-white px-2 py-0.5 rounded-full font-bold">2</span>
+                    </div>
+                    <h3 class="font-handwriting text-2xl font-bold text-gray-800 group-hover:text-rose-600">FLOWERS FOR YOU</h3>
+                    <p class="text-xs text-gray-400 mt-1">Our memories bouquet</p>
+                </div>
+
+                <!-- 3: A SONG FOR YOU -->
+                <div onclick="goToScreen('screen6')" class="polaroid group cursor-pointer transform -rotate-1 hover:rotate-0 transition-all duration-300 flex flex-col items-center text-center p-5 border border-pink-100 rounded-xl bg-white shadow-md hover:shadow-xl">
+                    <div class="washi-tape"></div>
+                    <div class="w-32 h-32 bg-amber-50 rounded-2xl flex items-center justify-center my-3 group-hover:scale-110 transition duration-300 border border-amber-100 relative">
+                        <i class="fa-solid fa-compact-disc text-5xl text-rose-500 group-hover:rotate-180 transition-transform duration-700"></i>
+                        <span class="absolute top-2 right-2 text-xs bg-rose-500 text-white px-2 py-0.5 rounded-full font-bold">3</span>
+                    </div>
+                    <h3 class="font-handwriting text-2xl font-bold text-gray-800 group-hover:text-rose-600">A SONG FOR YOU</h3>
+                    <p class="text-xs text-gray-400 mt-1">Dedicated music track</p>
+                </div>
+
+            </div>
+
+            <div class="mt-4 text-xs font-semibold text-rose-400">
+                Created with lots of love ❤️ Forever & Always
+            </div>
+        </section>
+
+        <!-- SCREEN 4: LOVE LETTER MODAL ("A MESSAGE FOR YOU") -->
+        <section id="screen4" class="screen w-full flex-col items-center p-4 sm:p-8 bg-kraft/30 rounded-3xl shadow-xl border-4 border-rose-200 min-h-[540px] relative overflow-y-auto max-h-[85vh]">
+            
+            <div class="w-full max-w-2xl bg-white/90 p-4 rounded-2xl border border-amber-200 shadow-sm flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center text-rose-500 text-2xl">
+                        🧸
+                    </div>
+                    <div>
+                        <h4 class="font-handwriting text-2xl font-bold text-rose-600">HI LOVE,</h4>
+                        <p class="text-xs text-gray-500">I wrote something special just for you 💕</p>
+                    </div>
+                </div>
+                <button onclick="goToScreen('screen3')" class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow transition flex items-center gap-1">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>GO BACK</span>
+                </button>
+            </div>
+
+            <div class="w-full max-w-2xl torn-paper p-6 sm:p-10 rounded-xl border border-amber-100 text-gray-800 shadow-lg space-y-6 relative">
+                
+                <div class="washi-tape left-1/2 -translate-x-1/2 -top-3"></div>
+
+                <div class="border-b border-rose-100 pb-4 text-center">
+                    <h2 class="font-cursive text-3xl sm:text-4xl text-rose-600">HI, My Baby 💕</h2>
+                    <p class="text-xs text-gray-400 font-serif italic mt-1">To my favorite person in the whole wide world</p>
+                </div>
+
+                <div class="font-serif text-sm sm:text-base leading-relaxed space-y-4 text-gray-700">
+                    <p>
+                       Sometimes, I wonder what I did to deserve someone as wonderful as you. Out of all the people in this world, somehow, life led me to you, and I can honestly say that I am one of the luckiest people alive because I have you in my life.
+                    </p>
+                    <p>
+                       You have no idea how much happiness you bring into my world. Your smile makes my bad days better, your voice brings me peace, and your presence makes even the simplest moments feel special. Just knowing that I have someone like you to love, care for, and share my life with is already a blessing I will never take for granted.
+                    </p>
+                    <p>
+                       I feel so lucky to have you, not just because of how beautiful you are, but because of the beautiful person you are inside. Your kindness, your love, your patience, and the little things you do make me fall in love with you over and over again. You make me feel things that words could never fully explain.
+                    </p>
+                    <p>
+                       Baby, if there is one thing I want you to always remember, it is that I will never stop being grateful for you. My love for you is real, and my heart will always choose you.
+                    </p>
+                    <p class="font-semibold text-rose-600">
+                       Forever grateful to have you, I love you so much, today, tomorrow, and forever.
+                    </p>
+                </div>
+
+                <!-- Embedded Romantic Photos inside letter -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-rose-100">
+    <!-- Photo 1: Woman in Red Dress -->
+    <div class="polaroid transform -rotate-2 text-center bg-white p-3 rounded-lg shadow-md border border-rose-100">
+        <div class="w-full h-48 overflow-hidden rounded">
+            <img src="8bfb37e4-f54b-4cb1-a83a-577d59125f97.jfif" alt="Sweetest Moments" class="w-full h-full object-cover">
+        </div>
+        <p class="font-handwriting text-xl text-gray-600 mt-2">Together is my favorite place 💕</p>
+    </div>
+
+    <!-- Photo 2: Man with Sunglasses -->
+    <div class="polaroid transform rotate-2 text-center bg-white p-3 rounded-lg shadow-md border border-rose-100">
+        <div class="w-full h-48 overflow-hidden rounded">
+            <img src="37f6a8a0-9262-406f-b75a-d4d224cb2046.jfif" alt="Our Love Story" class="w-full h-full object-cover">
+        </div>
+        <p class="font-handwriting text-xl text-gray-600 mt-2">My happy place 🌸</p>
+    </div>
+</div>
+
+                <div class="text-right pt-2 font-cursive text-2xl text-rose-600">
+                    - Forever Yours 💕
+                </div>
+            </div>
+
+            <button onclick="goToScreen('screen3')" class="my-6 bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:scale-105 active:scale-95 flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>GO BACK TO MENU</span>
+            </button>
+        </section>
+
+        <!-- SCREEN 5: SCRAPBOOK GALLERY ("FLOWERS FOR YOU") -->
+<section id="screen5" class="screen w-full flex-col items-center p-4 sm:p-8 grid-paper rounded-3xl shadow-xl border-4 border-rose-200 min-h-[540px] relative overflow-y-auto max-h-[85vh]">
+    
+    <div class="w-full max-w-3xl flex justify-between items-center mb-6">
+        <div class="flex items-center gap-2">
+            <span class="text-3xl">💐</span>
+            <h3 class="font-cursive text-3xl text-rose-600">Flowers For You</h3>
+        </div>
+        <button onclick="goToScreen('screen3')" class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow transition flex items-center gap-1">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>GO BACK</span>
+        </button>
+    </div>
+
+    <!-- Vintage Camera Film Strip with Date Stamps -->
+    <div class="w-full max-w-3xl bg-stone-1900 p-3 rounded-xl shadow-lg mb-8 overflow-x-auto border-y-4 border-stone-1800">
+        <div class="flex items-center space-x-3 min-w-max px-2">
+            <div class="relative group w-36 h-32 bg-stone-1800 rounded p-1 flex flex-col justify-between border border-stone-1700 overflow-hidden">
+                <img src="de8e93aa-6785-4631-b8bc-1dbcb323ae4b.jpg" alt="Memory photo" class="w-full h-22 object-cover rounded-sm">
+                <span class="bg-black/80 text-orange-400 font-mono text-[10px] px-1 py-0.5 rounded text-center border border-orange-500/30 mt-1">10/22/2026</span>
+            </div>
+            <div class="relative group w-36 h-32 bg-stone-1800 rounded p-1 flex flex-col justify-between border border-stone-1700 overflow-hidden">
+                <img src="4e71b9b5-ecb9-4646-8d4b-faee3a7bca93.jpg" alt="Memory photo" class="w-full h-22 object-cover rounded-sm">
+                <span class="bg-black/80 text-orange-400 font-mono text-[10px] px-1 py-0.5 rounded text-center border border-orange-500/30 mt-1">10/22/2026</span>
+            </div>
+            <div class="relative group w-36 h-32 bg-stone-1800 rounded p-1 flex flex-col justify-between border border-stone-1700 overflow-hidden">
+                <img src="4fa3b725-ff80-43a1-bec5-9d11b704770d.webp" alt="Memory photo" class="w-full h-22 object-cover rounded-sm">
+                <span class="bg-black/80 text-orange-400 font-mono text-[10px] px-1 py-0.5 rounded text-center border border-orange-500/30 mt-1">10/22/2026</span>
+            </div>
+            <div class="relative group w-36 h-32 bg-stone-1800 rounded p-1 flex flex-col justify-between border border-stone-1700 overflow-hidden">
+                <img src="73ddd9c5-b7c1-49aa-a2d8-a4ac8ca785c6.webp" alt="Memory photo" class="w-full h-22 object-cover rounded-sm">
+                <span class="bg-black/80 text-orange-400 font-mono text-[10px] px-1 py-0.5 rounded text-center border border-orange-500/30 mt-1">10/22/2026</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quote Cards and Polaroid Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-8 w-full max-w-3xl">
+        
+        <!-- Quote Card 1 -->
+        <div class="bg-amber-50/90 border border-amber-200 p-6 rounded-lg shadow-md transform -rotate-1 relative text-center">
+            <div class="w-16 h-4 bg-amber-200/60 absolute -top-2 left-1/2 -translate-x-1/2 rotate-1 shadow-sm"></div>
+            <p class="font-handwriting text-xl md:text-2xl text-pink-700 leading-relaxed">
+                "EVERY FLOWER TELLS A STORY. MINE BEGINS WITH YOU."
+            </p>
+        </div>
+
+        <!-- Polaroid 1 -->
+        <div class="polaroid bg-white p-3 shadow-md rounded transform rotate-2 max-w-xs mx-auto relative hover:rotate-0 transition duration-300">
+            <div class="w-20 h-6 bg-pink-200/60 absolute -top-3 left-1/2 -translate-x-1/2 -rotate-3 border border-pink-300/40 z-10"></div>
+            <div class="w-full h-52 bg-rose-100 rounded overflow-hidden">
+                <img src="8bfb37e4-f54b-4cb1-a83a-577d59125f97.jfif" alt="My favorite smile" class="w-full h-full object-cover">
+            </div>
+            <p class="font-handwriting text-center text-slate-600 mt-3 text-lg">My favorite smile ✨</p>
+        </div>
+
+        <!-- Polaroid 2 -->
+        <div class="polaroid bg-white p-3 shadow-md rounded transform -rotate-2 max-w-xs mx-auto relative hover:rotate-0 transition duration-300">
+            <div class="w-20 h-6 bg-amber-200/60 absolute -top-3 left-1/2 -translate-x-1/2 rotate-2 border border-amber-300/40 z-10"></div>
+            <div class="w-full h-52 bg-pink-50 rounded overflow-hidden">
+                <img src="9d447c6b-a8ea-4960-b8da-7a68d8c6af98.jfif" alt="Side by side" class="w-full h-full object-cover">
+            </div>
+            <p class="font-handwriting text-center text-slate-600 mt-3 text-lg">Side by side 💖</p>
+        </div>
+
+        <!-- Quote Card 2 -->
+        <div class="bg-amber-50/90 border border-amber-200 p-6 rounded-lg shadow-md transform rotate-2 relative text-center">
+            <div class="w-16 h-4 bg-amber-200/60 absolute -top-2 left-1/2 -translate-x-1/2 -rotate-2 shadow-sm"></div>
+            <p class="font-handwriting text-xl md:text-2xl text-pink-700 leading-relaxed">
+                "WHO NEEDS FLOWERS WHEN YOU'RE ALREADY THE PRETTIEST PART OF THIS BOUQUET?"
+            </p>
+        </div>
+
+        <!-- Polaroid 3 -->
+        <div class="polaroid bg-white p-3 shadow-md rounded transform rotate-1 max-w-xs mx-auto relative hover:rotate-0 transition duration-300">
+            <div class="w-20 h-6 bg-rose-200/60 absolute -top-3 left-1/2 -translate-x-1/2 -rotate-1 border border-rose-300/40 z-10"></div>
+            <div class="w-full h-52 bg-rose-50 rounded overflow-hidden">
+                <img src="b17e3bf9-831d-4c38-8188-b108bcf2bf7b.jfif" alt="Precious Moments" class="w-full h-full object-cover">
+            </div>
+            <p class="font-handwriting text-center text-slate-600 mt-3 text-lg">Precious moments 🌷</p>
+        </div>
+
+        <!-- Polaroid 4 -->
+        <div class="polaroid bg-white p-3 shadow-md rounded transform -rotate-1 max-w-xs mx-auto relative hover:rotate-0 transition duration-300">
+            <div class="w-20 h-6 bg-yellow-200/60 absolute -top-3 left-1/2 -translate-x-1/2 rotate-1 border border-yellow-300/40 z-10"></div>
+            <div class="w-full h-52 bg-amber-50 rounded overflow-hidden">
+                <img src="6e97e6c3-9fe2-46dd-a03b-4b87eb45ebec.jfif" alt="Forever & Always" class="w-full h-full object-cover">
+            </div>
+            <p class="font-handwriting text-center text-slate-600 mt-3 text-lg">Forever & Always 💕</p>
+        </div>
+
+    </div>
+</section>
+        <!-- SCREEN 6: MUSIC PLAYER ("A SONG FOR YOU") -->
+        <section id="screen6" class="screen w-full flex-col items-center p-4 sm:p-8 bg-gradient-to-b from-pink-100 to-rose-100 rounded-3xl shadow-xl border-4 border-rose-200 min-h-[540px] relative">
+            
+            <div class="w-full max-w-xl flex justify-between items-center mb-6">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-music text-2xl text-rose-500 animate-bounce"></i>
+                    <h3 class="font-cursive text-3xl text-rose-600">A Song For You</h3>
+                </div>
+                <button onclick="goToScreen('screen3')" class="bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow transition flex items-center gap-1">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>GO BACK</span>
+                </button>
+            </div>
+
+            <div class="w-full max-w-md bg-white/90 backdrop-blur rounded-3xl p-6 shadow-2xl border-2 border-rose-200 flex flex-col items-center text-center relative overflow-hidden my-auto">
+                
+                <div class="absolute top-3 left-3 bg-amber-100 border border-amber-300 px-3 py-1 rounded-full text-xs font-bold text-amber-700 flex items-center gap-1 shadow-sm">
+                    <span>💋</span>
+                    <span>MUA!</span>
+                </div>
+
+                <div class="relative my-6 group">
+                    <div id="vinylDisc" class="w-44 h-44 sm:w-52 sm:h-52 bg-gray-900 rounded-full border-4 border-gray-800 shadow-2xl flex items-center justify-center spinning-vinyl paused-vinyl relative">
+                        <div class="w-36 h-36 border border-gray-700 rounded-full flex items-center justify-center">
+                            <div class="w-28 h-28 border border-gray-800 rounded-full flex items-center justify-center">
+                                <div class="w-16 h-16 bg-rose-500 rounded-full border-4 border-white flex items-center justify-center text-white text-xs font-bold shadow-inner">
+                                    ❤️ LOVE
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 class="font-bold text-xl text-gray-800">Sa Bawat Sandali 💕</h4>
+                <p class="text-xs text-rose-500 font-semibold mt-1">Dedicated Special Track for Us</p>
+
+                <!-- Audio Wave Visualizer -->
+                <div class="flex items-center justify-center gap-1.5 h-8 my-4">
+                    <div class="w-1.5 bg-rose-400 rounded-full animate-pulse h-4"></div>
+                    <div class="w-1.5 bg-rose-500 rounded-full animate-pulse h-7"></div>
+                    <div class="w-1.5 bg-rose-300 rounded-full animate-pulse h-3"></div>
+                    <div class="w-1.5 bg-rose-600 rounded-full animate-pulse h-8"></div>
+                    <div class="w-1.5 bg-rose-400 rounded-full animate-pulse h-5"></div>
+                </div>
+
+                <!-- Custom Audio Player Controls -->
+               <div class="w-full space-y-3 mt-2">
+    <!-- Hidden Audio Element -->
+    <audio id="audioPlayer" src="Dulo Ng Pahina - Wilbert Ross LYRIC VISUALIZER.mp3"></audio>
+
+    <!-- Progress Bar -->
+    <div class="w-full bg-rose-100 h-2 rounded-full overflow-hidden cursor-pointer" onclick="seekAudio(event)">
+        <div id="progressBar" class="bg-rose-500 h-full w-0 transition-all duration-300"></div>
+    </div>
+    
+    <!-- Time Indicators -->
+    <div class="flex justify-between text-xs text-gray-400 font-mono">
+        <span id="currentTime">0:00</span>
+        <span id="totalTime">2:30</span>
+    </div>
+
+    <!-- Controls -->
+    <div class="flex items-center justify-center gap-6 pt-2">
+        <button onclick="rewindAudio()" class="text-rose-400 hover:text-rose-600 text-xl transition">
+            <i class="fa-solid fa-backward-step"></i>
+        </button>
+
+        <button id="mainPlayBtn" onclick="togglePlayMusic()" class="w-14 h-14 bg-rose-500 hover:bg-rose-600 text-white rounded-full flex items-center justify-center text-2xl shadow-lg transform transition active:scale-90">
+            <i id="mainPlayIcon" class="fa-solid fa-play ml-1"></i>
+        </button>
+
+        <button onclick="forwardAudio()" class="text-rose-400 hover:text-rose-600 text-xl transition">
+            <i class="fa-solid fa-forward-step"></i>
+        </button>
+    </div>
+</div>
+
+<script>
+    const audio = document.getElementById('audioPlayer');
+    const playBtn = document.getElementById('mainPlayBtn');
+    const playIcon = document.getElementById('mainPlayIcon');
+    const progressBar = document.getElementById('progressBar');
+    const currentTimeEl = document.getElementById('currentTime');
+    const totalTimeEl = document.getElementById('totalTime');
+
+    // Format seconds to mm:ss
+    function formatTime(seconds) {
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    }
+
+    // Load metadata to show total duration
+    audio.addEventListener('loadedmetadata', () => {
+        totalTimeEl.textContent = formatTime(audio.duration);
+    });
+
+    // Update progress bar and current time as audio plays
+    audio.addEventListener('timeupdate', () => {
+        const progressPercent = (audio.currentTime / audio.duration) * 100;
+        progressBar.style.width = `${progressPercent}%`;
+        currentTimeEl.textContent = formatTime(audio.currentTime);
+    });
+
+    // Toggle Play/Pause
+    function togglePlayMusic() {
+        if (audio.paused) {
+            audio.play();
+            playIcon.classList.remove('fa-play', 'ml-1');
+            playIcon.classList.add('fa-pause');
+        } else {
+            audio.pause();
+            playIcon.classList.remove('fa-pause');
+            playIcon.classList.add('fa-play', 'ml-1');
+        }
+    }
+
+    // Seek audio on progress bar click
+    function seekAudio(event) {
+        const width = event.currentTarget.clientWidth;
+        const clickX = event.offsetX;
+        const duration = audio.duration;
+        audio.currentTime = (clickX / width) * duration;
+    }
+
+    // Rewind 5 seconds
+    function rewindAudio() {
+        audio.currentTime = Math.max(0, audio.currentTime - 5);
+    }
+
+    // Forward 5 seconds
+    function forwardAudio() {
+        audio.currentTime = Math.min(audio.duration, audio.currentTime + 5);
+    }
+
+    // Reset button when audio ends
+    audio.addEventListener('ended', () => {
+        playIcon.classList.remove('fa-pause');
+        playIcon.classList.add('fa-play', 'ml-1');
+        progressBar.style.width = '0%';
+        audio.currentTime = 0;
+    });
+</script>
+
+            <button onclick="goToScreen('screen3')" class="my-6 bg-rose-500 hover:bg-rose-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transform transition hover:scale-105 active:scale-95 flex items-center gap-2">
+                <i class="fa-solid fa-arrow-left"></i>
+                <span>GO BACK</span>
+            </button>
+        </section>
+
+    </main>
+
+    <!-- JS Logic & Event Handlers -->
+    <script>
+        let soundOn = false;
+        let isMusicPlaying = false;
+        let synth = null;
+        let audioProgressTimer = null;
+        let currentSeconds = 0;
+        const totalDuration = 150;
+
+        function goToScreen(screenId) {
+            createHeartExplosion();
+            playClickSound();
+
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(s => s.classList.remove('active'));
+
+            const target = document.getElementById(screenId);
+            if(target) {
+                target.classList.add('active');
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function openGiftBox() {
+            const lid = document.getElementById('boxLid');
+            const items = document.getElementById('popOutItems');
+            const text = document.getElementById('boxInstruction');
+
+            createHeartExplosion();
+            playClickSound();
+
+            lid.style.transform = 'translateY(-80px) rotate(-15deg)';
+            items.style.opacity = '1';
+            items.style.transform = 'translate(-50%, -60px) scale(1.1)';
+            text.innerText = 'Opening your gift... ❤️';
+
+            setTimeout(() => {
+                goToScreen('screen3');
+            }, 1200);
+        }
+
+        function toggleAudio() {
+            const soundIcon = document.getElementById('soundIcon');
+            const soundText = document.getElementById('soundText');
+
+            if (!soundOn) {
+                soundOn = true;
+                soundIcon.className = "fa-solid fa-volume-high";
+                soundText.innerText = "Music: ON";
+                playClickSound();
+            } else {
+                soundOn = false;
+                soundIcon.className = "fa-solid fa-volume-xmark";
+                soundText.innerText = "Music: OFF";
+            }
+        }
+
+        function togglePlayMusic() {
+            const vinyl = document.getElementById('vinylDisc');
+            const playIcon = document.getElementById('mainPlayIcon');
+
+            if (!isMusicPlaying) {
+                isMusicPlaying = true;
+                vinyl.classList.remove('paused-vinyl');
+                playIcon.className = "fa-solid fa-pause";
+                startTimer();
+            } else {
+                isMusicPlaying = false;
+                vinyl.classList.add('paused-vinyl');
+                playIcon.className = "fa-solid fa-play ml-1";
+                clearInterval(audioProgressTimer);
+            }
+        }
+
+        function startTimer() {
+            clearInterval(audioProgressTimer);
+            audioProgressTimer = setInterval(() => {
+                if (currentSeconds < totalDuration) {
+                    currentSeconds++;
+                    updateProgressUI();
+                } else {
+                    currentSeconds = 0;
+                    togglePlayMusic();
+                }
+            }, 1000);
+        }
+
+        function updateProgressUI() {
+            const bar = document.getElementById('progressBar');
+            const timeStr = document.getElementById('currentTime');
+            
+            const pct = (currentSeconds / totalDuration) * 100;
+            bar.style.width = pct + '%';
+
+            const mins = Math.floor(currentSeconds / 60);
+            const secs = currentSeconds % 60;
+            timeStr.innerText = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        function rewindAudio() {
+            currentSeconds = Math.max(0, currentSeconds - 10);
+            updateProgressUI();
+        }
+
+        function forwardAudio() {
+            currentSeconds = Math.min(totalDuration, currentSeconds + 10);
+            updateProgressUI();
+        }
+
+        function seekAudio(e) {
+            const rect = e.currentTarget.getBoundingClientRect();
+            const clickX = e.clientX - rect.left;
+            const width = rect.width;
+            currentSeconds = Math.floor((clickX / width) * totalDuration);
+            updateProgressUI();
+        }
+
+        function playClickSound() {
+            try {
+                if (window.Tone) {
+                    if (!synth) {
+                        synth = new Tone.Synth({
+                            oscillator: { type: 'sine' },
+                            envelope: { attack: 0.01, decay: 0.1, sustain: 0.1, release: 0.2 }
+                        }).toDestination();
+                    }
+                    Tone.start();
+                    synth.triggerAttackRelease("C5", "8n");
+                }
+            } catch (e) {}
+        }
+
+        function createHeartExplosion() {
+            const count = 10;
+            for (let i = 0; i < count; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart-particle text-xl';
+                heart.innerHTML = ['❤️', '💖', '💕', '🌸', '✨'][Math.floor(Math.random() * 5)];
+                
+                const x = (window.innerWidth / 2) + (Math.random() * 200 - 100);
+                const y = (window.innerHeight / 2) + (Math.random() * 100 - 50);
+                
+                heart.style.left = `${x}px`;
+                heart.style.top = `${y}px`;
+
+                document.body.appendChild(heart);
+
+                setTimeout(() => {
+                    heart.remove();
+                }, 2500);
+            }
+        }
+
+        document.addEventListener('click', (e) => {
+            const heart = document.createElement('div');
+            heart.className = 'heart-particle text-lg';
+            heart.innerHTML = '❤️';
+            heart.style.left = `${e.clientX}px`;
+            heart.style.top = `${e.clientY}px`;
+            document.body.appendChild(heart);
+
+            setTimeout(() => heart.remove(), 2000);
+        });
+    </script>
+</body>
+</html>
